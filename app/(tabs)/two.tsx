@@ -7,7 +7,7 @@ import { ScreenContent } from '~/components/ui/screen-content';
 export default function Home() {
   return (
     <>
-      <Stack.Screen options={{ title: 'Tab Two' }} />
+      <Stack.Screen options={{ title: 'Profilim' }} />
       <Container>
         <ScreenContent path="app/(drawer)/(tabs)/two.tsx" title="Profilim" />
       </Container>

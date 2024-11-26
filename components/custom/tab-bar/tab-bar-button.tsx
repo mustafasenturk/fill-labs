@@ -1,83 +1,53 @@
-import type { FC } from 'react';
-import { useEffect } from 'react';
-import { Pressable, Text } from 'react-native';
-import Animated, {
-  interpolate,
-  interpolateColor,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-} from 'react-native-reanimated';
-import { Search, UserRound } from '~/components/icons';
-
-import type { Routes } from './tab-bar';
+import React, { useEffect } from 'react';
+import { Pressable, Text, View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { cn } from '~/lib';
-import { MOBILE_THEME } from '~/constants/theme';
 
 export interface TabBarButtonProps {
   onPress: () => void;
   onLongPress: () => void;
-  routeName: Routes;
+  routeName: string;
   isFocused: boolean;
   label: string;
 }
 
-export const TabBarButton = ({
-  onPress,
-  onLongPress,
-  isFocused,
-  routeName,
-  label,
-}: TabBarButtonProps) => {
-  const icon: Record<Routes, FC<{ color: string }>> = {
-    index: ({ color }) => <Search color={color} size={24} />,
-    two: ({ color }) => <UserRound color={color} size={24} />,
-  };
-
+export const TabBarButton = ({ onPress, onLongPress, isFocused, label }: TabBarButtonProps) => {
   const scale = useSharedValue(0);
-  const backgroundColor = useSharedValue(0);
 
   useEffect(() => {
-    scale.value = withSpring(typeof isFocused === 'boolean' ? (isFocused ? 1 : 0) : 0, {
-      duration: 350,
+    scale.value = withSpring(isFocused ? 1 : 0, {
+      damping: 15,
+      stiffness: 150,
     });
-    backgroundColor.value = withSpring(isFocused ? 1 : 0, {
-      duration: 350,
-    });
-  }, [isFocused, scale, backgroundColor]);
+  }, [isFocused, scale]);
 
   const animatedStyle = useAnimatedStyle(() => {
-    const scaleValue = interpolate(scale.value, [0, 1], [1, 1.2]);
-    const backgroundColorValue = interpolateColor(
-      backgroundColor.value,
-      [0, 1],
-      ['transparent', MOBILE_THEME.background]
-    );
-
-    return { transform: [{ scale: scaleValue }], backgroundColor: backgroundColorValue };
+    return {
+      transform: [{ scaleX: scale.value }],
+    };
   });
 
   return (
     <Pressable
-      accessibilityLabel={routeName}
-      accessibilityLabelledBy={`tab-bar-${routeName}`}
+      accessibilityLabel={label}
       accessibilityRole="button"
       accessibilityState={{ selected: isFocused }}
-      className={cn('flex-1 items-center justify-center rounded-full')}
+      className={cn('flex-1 items-center justify-center')}
       onLongPress={onLongPress}
       onPress={onPress}>
-      <Animated.View
-        className="mb-1 h-10 w-20 items-center justify-center rounded-full"
-        style={[animatedStyle]}>
-        {icon[routeName]({ color: isFocused ? 'black' : MOBILE_THEME.background })}
-      </Animated.View>
-      <Text
-        className={cn(
-          'text-base font-medium tracking-wide',
-          isFocused ? 'text-black' : 'text-gray-400'
-        )}>
-        {label}
-      </Text>
+      <View className="items-center">
+        <Text
+          className={cn(
+            'text-lg font-medium tracking-wide',
+            isFocused ? 'text-primary' : 'text-gray-400'
+          )}>
+          {label}
+        </Text>
+        <Animated.View
+          className="mt-1 h-0.5 w-24 rounded-full bg-primary"
+          style={[animatedStyle, { opacity: isFocused ? 1 : 0 }]}
+        />
+      </View>
     </Pressable>
   );
 };

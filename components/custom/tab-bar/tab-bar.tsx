@@ -1,16 +1,34 @@
-import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import type {
+  createMaterialTopTabNavigator,
+  MaterialTopTabNavigationEventMap,
+  MaterialTopTabNavigationOptions,
+} from '@react-navigation/material-top-tabs';
+import type { ParamListBase, TabNavigationState } from '@react-navigation/native';
 import { View } from 'react-native';
+import { withLayoutContext } from 'expo-router';
 
+import React from 'react';
+import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useHaptic } from '~/hooks';
 import { TabBarButton } from './tab-bar-button';
 
-export type Routes = 'index' | 'two';
+export type Routes = 'index' | 'two' | 'three';
+
+export const createMaterialTopTabs = (
+  Navigator: ReturnType<typeof createMaterialTopTabNavigator>['Navigator']
+) =>
+  withLayoutContext<
+    MaterialTopTabNavigationOptions,
+    typeof Navigator,
+    TabNavigationState<ParamListBase>,
+    MaterialTopTabNavigationEventMap
+  >(Navigator);
 
 export function TabBar({ state, navigation }: BottomTabBarProps) {
   const impact = useHaptic();
 
   return (
-    <View className="shadow-primary flex-row items-center justify-between bg-white px-4 py-4 shadow">
+    <View className="flex-row items-center justify-between bg-white px-4 py-4 shadow shadow-primary">
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
         const routeName = route.name as Routes;
@@ -40,7 +58,7 @@ export function TabBar({ state, navigation }: BottomTabBarProps) {
             routeName={routeName}
             onLongPress={onLongPress}
             onPress={onPress}
-            label={routeName === 'index' ? 'Arama' : routeName === 'two' ? 'Profilim' : ''}
+            label={routeName === 'index' ? 'Bilgiler' : routeName === 'two' ? 'Tab B' : 'Tab C'}
           />
         );
       })}

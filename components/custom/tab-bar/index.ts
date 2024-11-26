@@ -1,2 +1,2 @@
-export * from './tab-bar-button';
 export * from './tab-bar';
+export * from './tab-bar-button';

@@ -57,8 +57,8 @@ const DocumentItem = (item: Document) => {
       className={cn(
         'flex flex-col justify-between rounded-2xl p-4',
         item.status === 'active'
-          ? 'bg-background border-primary border'
-          : 'bg-secondary border border-gray-500'
+          ? 'border border-primary bg-background'
+          : 'border border-gray-500 bg-secondary'
       )}>
       <View className="flex w-full flex-row items-center justify-between">
         <View className="flex flex-row items-center justify-center gap-x-2">
@@ -66,10 +66,10 @@ const DocumentItem = (item: Document) => {
           <Copy className="text-black" size={16} />
           <View
             className={cn(
-              'bg-primary rounded-full p-1 px-4',
+              'rounded-full bg-primary p-1 px-4',
               item.status === 'active'
-                ? 'border-primary bg-primary border'
-                : 'bg-white-400 border-green border'
+                ? 'border border-primary bg-primary'
+                : 'bg-white-400 border border-green'
             )}>
             <Text
               className={cn(
@@ -84,7 +84,7 @@ const DocumentItem = (item: Document) => {
           <View className="flex gap-2">
             <DropDown>
               <DropDownTrigger>
-                <Pressable className="bg-primary h-8 w-8 items-center justify-center rounded-full">
+                <Pressable className="h-8 w-8 items-center justify-center rounded-full bg-primary">
                   <EllipsisVertical className="text-white" size={18} />
                 </Pressable>
               </DropDownTrigger>
@@ -182,7 +182,7 @@ export default function Home() {
         <View className="my-6 flex w-full flex-row items-center justify-between">
           <TouchableOpacity
             className={cn(
-              'bg-secondary flex flex-row items-center rounded-full px-10 py-2',
+              'flex flex-row items-center rounded-full bg-secondary px-10 py-2',
               status === 'all' ? 'bg-background' : 'bg-secondary'
             )}
             onPress={() => setStatus('all')}>
@@ -196,7 +196,7 @@ export default function Home() {
           </TouchableOpacity>
           <TouchableOpacity
             className={cn(
-              'bg-secondary flex flex-row items-center rounded-full px-10 py-2',
+              'flex flex-row items-center rounded-full bg-secondary px-10 py-2',
               status === 'active' ? 'bg-background' : 'bg-secondary'
             )}
             onPress={() => setStatus('active')}>
@@ -210,7 +210,7 @@ export default function Home() {
           </TouchableOpacity>
           <TouchableOpacity
             className={cn(
-              'bg-secondary flex flex-row items-center rounded-full px-10 py-2',
+              'flex flex-row items-center rounded-full bg-secondary px-10 py-2',
               status === 'inactive' ? 'bg-background' : 'bg-secondary'
             )}
             onPress={() => setStatus('inactive')}>
@@ -246,7 +246,7 @@ export default function Home() {
         />
         <Pressable
           onPress={() => router.push({ pathname: '/(top-tabs)', params: { pageType: 'add' } })}
-          className="bg-primary absolute bottom-6 right-0 flex flex-row items-center gap-x-2 rounded-full px-6 py-4">
+          className="absolute bottom-6 right-0 flex flex-row items-center gap-x-2 rounded-full bg-primary px-6 py-4">
           <Plus className="text-white" size={24} />
           <Text className="text-xl font-semibold tracking-wide text-white">Dosya Ekle</Text>
         </Pressable>

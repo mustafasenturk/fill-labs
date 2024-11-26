@@ -1,36 +1,24 @@
-import type {
-  MaterialTopTabBarProps,
-  MaterialTopTabNavigationEventMap,
-  MaterialTopTabNavigationOptions,
-} from '@react-navigation/material-top-tabs';
-import type { ParamListBase, TabNavigationState } from '@react-navigation/native';
-import type { FC } from 'react';
-import React, { useCallback } from 'react';
-import { Pressable, TouchableOpacity, View } from 'react-native';
-import { router, Stack, withLayoutContext } from 'expo-router';
-import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
+import React from 'react';
 import * as Haptics from 'expo-haptics';
+import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-import { Text } from '~/components/ui/text';
+import { createMaterialTopTabs, TabBar } from '~/components/custom/tab-bar';
+import { ChevronLeft, EllipsisVertical, UserRound } from '~/components/icons';
+import { router, Stack } from 'expo-router';
+import { Pressable, View, Text, TouchableOpacity } from 'react-native';
 import { cn } from '~/lib';
-import { ChevronLeft, EllipsisVertical } from '~/components/icons';
-import { useSearchParams } from 'expo-router/build/hooks';
-import { useDocumentStore } from '~/store/documentStore';
 import {
   DropDown,
   DropDownContent,
   DropDownItem,
   DropDownTrigger,
 } from '~/components/ui/dropdown-menu';
+import { useSearchParams } from 'expo-router/build/hooks';
+import { useDocumentStore } from '~/store/documentStore';
 
 const { Navigator } = createMaterialTopTabNavigator();
 
-export const MaterialTopTabs = withLayoutContext<
-  MaterialTopTabNavigationOptions,
-  typeof Navigator,
-  TabNavigationState<ParamListBase>,
-  MaterialTopTabNavigationEventMap
->(Navigator);
+export const MaterialTopTabs = createMaterialTopTabs(Navigator);
 
 interface HeaderLeftProps {
   isEdit: boolean;
@@ -70,13 +58,13 @@ interface HeaderRightProps {
 
 const headerRight = ({ status, id, changeStatus }: HeaderRightProps) => {
   return (
-    <View className="elevation-xl flex-grow-0 flex-row items-center justify-center gap-x-2">
+    <View className="flex-grow-0 flex-row items-center justify-center gap-x-2">
       <View
         className={cn(
-          'bg-primary rounded-full p-1 px-4',
+          'rounded-full bg-primary p-1 px-4',
           status === 'active'
-            ? 'bg-primary border-primary border'
-            : 'bg-white-400 border-green border'
+            ? 'border border-primary bg-primary'
+            : 'bg-white-400 border border-green'
         )}>
         <Text
           className={cn(
@@ -117,7 +105,6 @@ export default () => {
   const id = useSearchParams().get('id');
   const document = useDocumentStore((state) => state.getDocumentById(Number(id)));
   const changeStatus = useDocumentStore((state) => state.changeStatus);
-
   return (
     <>
       <Stack.Screen
@@ -142,62 +129,36 @@ export default () => {
           headerShadowVisible: false,
         }}
       />
-      <MaterialTopTabs tabBar={CustomTabBar}>
+      <MaterialTopTabs
+        screenListeners={{
+          tabPress: () => Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Soft),
+        }}
+        tabBar={TabBar}>
         <MaterialTopTabs.Screen
           key="index"
           name="index"
-          options={{ title: 'Bilgiler' }}
-          initialParams={{ pageType, id }}
+          initialParams={{ pageType, id: Number(id) }}
+          options={{
+            tabBarIcon: ({ color }: { color: string }) => <UserRound color={color} size={24} />,
+          }}
         />
-        <MaterialTopTabs.Screen key="two" name="two" options={{ title: 'Tab B' }} />
-        <MaterialTopTabs.Screen key="three" name="three" options={{ title: 'Tab C' }} />
+        <MaterialTopTabs.Screen
+          key="two"
+          name="two"
+          initialParams={{ pageType, id: Number(id) }}
+          options={{
+            tabBarIcon: ({ color }: { color: string }) => <UserRound color={color} size={24} />,
+          }}
+        />
+        <MaterialTopTabs.Screen
+          key="three"
+          name="three"
+          initialParams={{ pageType, id: Number(id) }}
+          options={{
+            tabBarIcon: ({ color }: { color: string }) => <UserRound color={color} size={24} />,
+          }}
+        />
       </MaterialTopTabs>
     </>
-  );
-};
-
-const CustomTabBar: FC<MaterialTopTabBarProps> = ({ state, descriptors, navigation }) => {
-  return (
-    <View className="flex-row rounded-md bg-white">
-      {state.routes.map((route, index) => {
-        const descriptor = descriptors[route.key];
-        if (!descriptor) return null;
-        const { options } = descriptor;
-        const label = options.title ?? route.name;
-
-        const isFocused = state.index === index;
-
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
-
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
-
-        return (
-          <TouchableOpacity
-            className={cn('flex-1 items-center justify-center rounded-md px-4 pt-4', {
-              'bg-white': isFocused,
-            })}
-            key={route.key}
-            onPress={onPress}>
-            <Text
-              className={cn('text-xl font-medium', isFocused ? 'text-primary' : 'text-gray-500')}>
-              {label}
-            </Text>
-            {isFocused ? (
-              <View className="bg-primary mt-1 h-0.5 w-full rounded-full" />
-            ) : (
-              <View className="mt-1 h-0.5 w-full rounded-full bg-white" />
-            )}
-          </TouchableOpacity>
-        );
-      })}
-    </View>
   );
 };
