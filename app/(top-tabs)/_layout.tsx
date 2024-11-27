@@ -1,18 +1,12 @@
-import React from 'react';
+import React, { Dispatch, useState } from 'react';
 import * as Haptics from 'expo-haptics';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
 import { createMaterialTopTabs, TabBar } from '~/components/custom/tab-bar';
 import { ChevronLeft, EllipsisVertical, UserRound } from '~/components/icons';
 import { router, Stack } from 'expo-router';
-import { Pressable, View, Text, TouchableOpacity } from 'react-native';
+import { Pressable, View, Text, TouchableOpacity, Modal } from 'react-native';
 import { cn } from '~/lib';
-import {
-  DropDown,
-  DropDownContent,
-  DropDownItem,
-  DropDownTrigger,
-} from '~/components/ui/dropdown-menu';
 import { useSearchParams } from 'expo-router/build/hooks';
 import { useDocumentStore } from '~/store/documentStore';
 
@@ -54,11 +48,13 @@ interface HeaderRightProps {
   status: 'active' | 'inactive';
   id: number;
   changeStatus: (id: number) => void;
+  visible?: boolean;
+  setVisible?: Dispatch<React.SetStateAction<boolean>>;
 }
 
-const headerRight = ({ status, id, changeStatus }: HeaderRightProps) => {
+const headerRight = ({ status, id, changeStatus, visible, setVisible }: HeaderRightProps) => {
   return (
-    <View className="flex-grow-0 flex-row items-center justify-center gap-x-2">
+    <View className="flex flex-row items-center justify-center gap-x-2">
       <View
         className={cn(
           'rounded-full bg-primary p-1 px-4',
@@ -74,28 +70,34 @@ const headerRight = ({ status, id, changeStatus }: HeaderRightProps) => {
           {status === 'active' ? 'Açık' : 'Kapandı'}
         </Text>
       </View>
-      <View className="flex gap-2">
-        <DropDown>
-          <DropDownTrigger>
-            <Pressable className="h-8 w-8 items-center justify-center rounded-full bg-gray-500">
-              <EllipsisVertical className="text-white" size={18} />
-            </Pressable>
-          </DropDownTrigger>
-          <DropDownContent>
-            <DropDownItem>
-              <TouchableOpacity
-                onPress={() => {
-                  changeStatus(id);
-                }}
-                className="flex items-start bg-white px-2 py-3">
-                <Text className="text-lg text-black">
-                  {status === 'active' ? 'Dosya Kapat' : 'Dosya Aç'}
-                </Text>
-              </TouchableOpacity>
-            </DropDownItem>
-          </DropDownContent>
-        </DropDown>
-      </View>
+      <Pressable
+        onPress={() => setVisible?.((prev) => !prev)}
+        className="h-8 w-8 items-center justify-center rounded-full bg-gray-500">
+        <EllipsisVertical className="text-white" size={18} />
+      </Pressable>
+      <Modal
+        transparent={true}
+        visible={visible}
+        animationType="none"
+        onRequestClose={() => setVisible?.((prev) => !prev)}>
+        <Pressable
+          className="mt-16 flex-1 bg-transparent bg-opacity-50"
+          onPress={() => setVisible?.((prev) => !prev)}>
+          <View className="absolute right-4 top-12 w-56 rounded-md bg-white shadow-lg">
+            <TouchableOpacity
+              onPress={() => {
+                changeStatus(id);
+                setVisible?.((prev) => !prev);
+                console.log('status changed');
+              }}
+              className="items-start bg-white px-4 py-3">
+              <Text className="text-lg text-black">
+                {status === 'active' ? 'Dosya Kapat' : 'Dosya Aç'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -105,6 +107,7 @@ export default () => {
   const id = useSearchParams().get('id');
   const document = useDocumentStore((state) => state.getDocumentById(Number(id)));
   const changeStatus = useDocumentStore((state) => state.changeStatus);
+  const [isDropdownVisible, setDropdownVisible] = useState(false);
   return (
     <>
       <Stack.Screen
@@ -124,6 +127,8 @@ export default () => {
                     status: document?.status ?? 'inactive',
                     changeStatus: changeStatus,
                     id: Number(id),
+                    visible: isDropdownVisible,
+                    setVisible: setDropdownVisible,
                   })
               : undefined,
           headerShadowVisible: false,

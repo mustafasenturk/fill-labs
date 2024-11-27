@@ -38,7 +38,7 @@ const DropDownContent = ({ className, children }: DropDownContentTypes) => {
       {open && (
         <View
           className={cn(
-            'elevation-xl absolute right-0 top-10 z-50 w-56 rounded-md bg-white shadow-lg',
+            'absolute right-0 top-10 z-50 w-56 rounded-md bg-white shadow-lg',
             className
           )}>
           {children}
@@ -63,13 +63,12 @@ type DropDownItemProps = {
 
 const DropDownItem = ({ children, className }: DropDownItemProps) => {
   const { setOpen } = useDropdown();
-
   const handlePress = () => {
     setOpen(false);
   };
 
   return (
-    <View className={cn('elevation-xl z-50 w-full', className)} onTouchEnd={handlePress}>
+    <View className={cn('z-50 w-full', className)} onTouchEnd={handlePress}>
       {children}
     </View>
   );
